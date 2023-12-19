@@ -1,6 +1,6 @@
 import fastapi
 
-app = fastapi
+app = fastapi.FastAPI()
 
 @app.get("/")
 async def proba():
