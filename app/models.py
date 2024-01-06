@@ -7,6 +7,10 @@ class Ljubimac(BaseModel):
     opis: str
     status: str
 
+class KreiranjeKorisnika(BaseModel):
+    email: EmailStr
+    lozinka: str
+
 class Korisnik(BaseModel):
     email: EmailStr
     id: str
