@@ -1,9 +1,13 @@
 from models import Ljubimac, KreiranjeKorisnika, Korisnik
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
+from security import get_password_hash
 
 async def create_user(db: AsyncIOMotorClient, user: KreiranjeKorisnika):
-    result = await db["users"].insert_one(user.dict())
+    hashed_password = get_password_hash(user.lozinka)
+    user_dict = user.dict()
+    user_dict['lozinka'] = hashed_password
+    result = await db["users"].insert_one(user_dict)
     return str(result.inserted_id)
 
 async def get_user(db: AsyncIOMotorClient, user_id: str):

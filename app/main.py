@@ -3,6 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from .db import get_database, close_mongo_connection, connect_to_mongo
 from .models import Ljubimac, KreiranjeKorisnika, Korisnik
 from .crud import create_pet, get_pets, get_pet, create_user, get_user
+from security import create_access_token, verify_password
 
 app = FastAPI()
 
