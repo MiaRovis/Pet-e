@@ -3,6 +3,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from security import get_password_hash
 from fastapi import HTTPException
+from .models import Udomi
+from datetime import datetime
 
 async def create_user(db: AsyncIOMotorClient, user: KreiranjeKorisnika):
     try:
@@ -45,5 +47,17 @@ async def get_pet(db: AsyncIOMotorClient, pet_id: str):
         if pet:
             return pet
         raise HTTPException(status_code=404, detail="Pet not found")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+async def udomi_pet(db: AsyncIOMotorClient, udomi_data: Udomi):
+    try:
+        adoption_data = {
+            "korisnik_id": udomi_data.korisnik_id,
+            "ljubimac_id": udomi_data.ljubimac_id,
+            "datum_udomljavanja": datetime.utcnow()
+        }
+        result = await db["udomi"].insert_one(adoption_data)
+        return str(result.inserted_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

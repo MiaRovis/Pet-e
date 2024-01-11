@@ -1,4 +1,6 @@
 from pydantic import BaseModel, EmailStr
+from bson import ObjectId
+from datetime import datetime
 
 class Ljubimac(BaseModel):
     ime: str
@@ -16,7 +18,8 @@ class Korisnik(BaseModel):
     id: str
 
 class Udomi(BaseModel):
-    korisnik_id: str
-    ljubimac: str
+    korisnik_id: ObjectId
+    ljubimac_id: ObjectId
+    datum_udomljavanja: datetime
 
 
