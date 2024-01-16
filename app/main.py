@@ -4,6 +4,7 @@ from .db import get_database, close_mongo_connection, connect_to_mongo
 from .models import Ljubimac, KreiranjeKorisnika, Korisnik, Udomi
 from .crud import create_pet, get_pets, get_pet, create_user, get_user, udomi_pet
 from .schemas import ErrorResponse
+from fastapi import FastAPI, Depends, HTTPException
 
 app = FastAPI()
 
