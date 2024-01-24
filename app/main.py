@@ -5,6 +5,7 @@ from .models import Ljubimac, KreiranjeKorisnika, Korisnik, Udomi
 from .crud import create_pet, get_pets, get_pet, create_user, get_user, udomi_pet
 from .schemas import ErrorResponse
 from fastapi import FastAPI, Depends, HTTPException
+import logging
 
 app = FastAPI()
 
@@ -14,6 +15,10 @@ async def proba():
 
 @app.on_event("startup")
 async def startup_event():
+        logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
         await connect_to_mongo()
 
 @app.on_event("shutdown")
@@ -24,10 +29,13 @@ async def shutdown_event():
 async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClient = Depends(get_database)):
     try:
         user_id = await create_user(db, user)
+        logging.info(f"User created successfully. User ID: {user_id}")
         return user_id
     except HTTPException as e:
+        logging.warning(f"HTTPException: {e}")
         raise HTTPException(status_code=e.status_code, detail=ErrorResponse(detail=e.detail))
     except Exception as e:
+        logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.get("/users/{user_id}", response_model=Korisnik)
@@ -46,8 +54,10 @@ async def kreiraj_ljubimca(pet: Ljubimac, db: AsyncIOMotorClient = Depends(get_d
         pet_id = await create_pet(db, pet)
         return pet_id
     except HTTPException as e:
+        logging.warning(f"HTTPException: {e}")
         raise HTTPException(status_code=e.status_code, detail=ErrorResponse(detail=e.detail))
     except Exception as e:
+        logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.get("/ljubimci/", response_model=list[Ljubimac])
@@ -77,6 +87,8 @@ async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClient = Depends(get
         result = await udomi_pet(db, udomi_data)
         return result
     except HTTPException as e:
+        logging.warning(f"HTTPException: {e}")
         raise HTTPException(status_code=e.status_code, detail=ErrorResponse(detail=e.detail))
     except Exception as e:
+        logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))

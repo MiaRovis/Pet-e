@@ -5,6 +5,7 @@ from security import get_password_hash
 from fastapi import HTTPException
 from .models import Udomi
 from datetime import datetime
+import logging
 
 async def create_user(db: AsyncIOMotorClient, user: KreiranjeKorisnika):
     try:
@@ -30,8 +31,10 @@ async def get_user(db: AsyncIOMotorClient, user_id: str):
 async def create_pet(db: AsyncIOMotorClient, pet: Ljubimac):
     try:
         result = await db["ljubimci"].insert_one(pet.dict())
+        logging.info(f"Pet created successfully. Pet ID: {str(result.inserted_id)}")
         return str(result.inserted_id)
     except Exception as e:
+        logging.error(f"Pet creation failed. Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 async def get_pets(db: AsyncIOMotorClient):
@@ -58,6 +61,7 @@ async def udomi_pet(db: AsyncIOMotorClient, udomi_data: Udomi):
             "datum_udomljavanja": datetime.utcnow()
         }
         result = await db["udomi"].insert_one(adoption_data)
+        logging.info(f"Pet adopted successfully. Adopter ID: {udomi_data.korisnik_id}, Pet ID: {udomi_data.ljubimac_id}")
         return str(result.inserted_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
