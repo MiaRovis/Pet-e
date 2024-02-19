@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from .db import get_database, close_mongo_connection, connect_to_mongo
-from .models import Ljubimac, KreiranjeKorisnika, Korisnik, Udomi
+from .models import Ljubimac, KreiranjeKorisnika, Korisnik, Udomi, DeleteAdoption
 from .crud import create_pet, get_pets, get_pet, create_user, get_user, udomi_pet
 from .schemas import ErrorResponse
 from fastapi import FastAPI, Depends, HTTPException
@@ -92,3 +92,11 @@ async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClient = Depends(get
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
+    
+@app.delete("/udomi/{adoption_id}", response_model=DeleteAdoption)
+async def delete_adoption_request(adoption_id: str, db = Depends(get_database)):
+    adoption_request = await db.get_adoption_request_by_id(adoption_id)
+    if not adoption_request:
+        raise HTTPException(status_code=404, detail="Adoption request not found")
+    await db.delete_adoption_request(adoption_id)
+    return DeleteAdoption(message="Adoption request deleted successfully")

@@ -22,4 +22,6 @@ class Udomi(BaseModel):
     ljubimac_id: ObjectId
     datum_udomljavanja: datetime
 
+class DeleteAdoption(BaseModel):
+    message: str
 
