@@ -7,7 +7,9 @@ from .models import Udomi
 from datetime import datetime
 import logging
 
-async def create_user(db: AsyncIOMotorClient, user: KreiranjeKorisnika):
+AsyncIOMotorClientType = AsyncIOMotorClient
+
+async def create_user(db: AsyncIOMotorClientType, user: KreiranjeKorisnika):
     try:
         hashed_password = get_password_hash(user.lozinka)
         user_dict = user.dict()
@@ -18,7 +20,7 @@ async def create_user(db: AsyncIOMotorClient, user: KreiranjeKorisnika):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-async def get_user(db: AsyncIOMotorClient, user_id: str):
+async def get_user(db: AsyncIOMotorClientType, user_id: str):
     try:
         user = await db["users"].find_one({"_id": ObjectId(user_id)})
         if user:
@@ -28,7 +30,7 @@ async def get_user(db: AsyncIOMotorClient, user_id: str):
         raise HTTPException(status_code=500, detail=str(e))
     
 
-async def create_pet(db: AsyncIOMotorClient, pet: Ljubimac):
+async def create_pet(db: AsyncIOMotorClientType, pet: Ljubimac):
     try:
         result = await db["ljubimci"].insert_one(pet.dict())
         logging.info(f"Pet created successfully. Pet ID: {str(result.inserted_id)}")
@@ -37,14 +39,14 @@ async def create_pet(db: AsyncIOMotorClient, pet: Ljubimac):
         logging.error(f"Pet creation failed. Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-async def get_pets(db: AsyncIOMotorClient):
+async def get_pets(db: AsyncIOMotorClientType):
     try:
         pets = await db["ljubimci"].find().to_list(length=None)
         return pets
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-async def get_pet(db: AsyncIOMotorClient, pet_id: str):
+async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
     try:
         pet = await db["ljubimci"].find_one({"_id": ObjectId(pet_id)})
         if pet:
@@ -53,7 +55,7 @@ async def get_pet(db: AsyncIOMotorClient, pet_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-async def udomi_pet(db: AsyncIOMotorClient, udomi_data: Udomi):
+async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
     try:
         adoption_data = {
             "korisnik_id": udomi_data.korisnik_id,

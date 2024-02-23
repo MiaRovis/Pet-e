@@ -12,6 +12,7 @@ load_dotenv()
 
 app = FastAPI()
 
+AsyncIOMotorClientType = AsyncIOMotorClient
 
 @app.get("/")
 async def proba():
@@ -31,7 +32,7 @@ app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
 
 @app.post("/users/", response_model=str)
-async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClient = Depends(get_database)):
+async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         user_id = await create_user(db, user)
         logging.info(f"User created successfully. User ID: {user_id}")
@@ -44,7 +45,7 @@ async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClient = Dep
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.get("/users/{user_id}", response_model=Korisnik)
-async def get_user_info(user_id: str, db: AsyncIOMotorClient = Depends(get_database)):
+async def get_user_info(user_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         user = await get_user(db, user_id)
         return user
@@ -54,7 +55,7 @@ async def get_user_info(user_id: str, db: AsyncIOMotorClient = Depends(get_datab
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.post("/ljubimci/", response_model=str)
-async def kreiraj_ljubimca(pet: Ljubimac, db: AsyncIOMotorClient = Depends(get_database)):
+async def kreiraj_ljubimca(pet: Ljubimac, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         pet_id = await create_pet(db, pet)
         return pet_id
@@ -66,7 +67,7 @@ async def kreiraj_ljubimca(pet: Ljubimac, db: AsyncIOMotorClient = Depends(get_d
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.get("/ljubimci/", response_model=list[Ljubimac])
-async def dohvati_ljubimce(db: AsyncIOMotorClient = Depends(get_database)):
+async def dohvati_ljubimce(db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         return await get_pets(db)
     except HTTPException as e:
@@ -75,7 +76,7 @@ async def dohvati_ljubimce(db: AsyncIOMotorClient = Depends(get_database)):
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.get("/ljubimci/{ljubimac_id}", response_model=Ljubimac)
-async def dohvati_ljubimca(ljubimac_id: str, db: AsyncIOMotorClient = Depends(get_database)):
+async def dohvati_ljubimca(ljubimac_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         pet = await get_pet(db, ljubimac_id)
         if pet:
@@ -87,7 +88,7 @@ async def dohvati_ljubimca(ljubimac_id: str, db: AsyncIOMotorClient = Depends(ge
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
 
 @app.post("/udomi/", response_model=str)
-async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClient = Depends(get_database)):
+async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         result = await udomi_pet(db, udomi_data)
         return result
@@ -99,7 +100,7 @@ async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClient = Depends(get
         raise HTTPException(status_code=500, detail=ErrorResponse(detail=str(e)))
     
 @app.delete("/udomi/{adoption_id}", response_model=DeleteAdoption)
-async def delete_adoption_request(adoption_id: str, db: AsyncIOMotorClient = Depends(get_database)):
+async def delete_adoption_request(adoption_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     adoption_request = await db.get_adoption_request_by_id(adoption_id)
     if not adoption_request:
         raise HTTPException(status_code=404, detail="Adoption request not found")

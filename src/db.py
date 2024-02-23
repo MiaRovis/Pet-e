@@ -1,7 +1,9 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 
+AsyncIOMotorClientType = AsyncIOMotorClient
+
 class DataBase:
-    client: AsyncIOMotorClient = None
+    client: AsyncIOMotorClientType = None
 
 db = DataBase()
 
