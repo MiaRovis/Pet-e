@@ -1,2 +1,2 @@
 # Pet-e
-Projekt  iz kolegija "Raspodjeljeni sustav"; izrada raspodjeljenog sustava odnosno razvoj backenda
+Projekt  iz kolegija "Raspodjeljeni sustavi"; izrada raspodjeljenog sustava odnosno razvoj backenda
