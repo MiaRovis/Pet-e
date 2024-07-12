@@ -1,7 +1,7 @@
-from models import Ljubimac, KreiranjeKorisnika, Korisnik
+from .models import Ljubimac, KreiranjeKorisnika, Korisnik
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from security import get_password_hash
+from .security import get_password_hash
 from fastapi import HTTPException
 from .models import Udomi
 from datetime import datetime

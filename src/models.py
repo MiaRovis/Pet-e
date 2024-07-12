@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, validator
+from pydantic import BaseModel, EmailStr
 from bson import ObjectId
 from datetime import datetime
 
@@ -21,6 +21,9 @@ class Udomi(BaseModel):
     korisnik_id: ObjectId
     ljubimac_id: ObjectId
     datum_udomljavanja: datetime
+      
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class DeleteAdoption(BaseModel):
