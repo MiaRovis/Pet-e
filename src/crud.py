@@ -1,11 +1,12 @@
-from .models import Ljubimac, KreiranjeKorisnika, Korisnik
+from .schemas import ErrorResponse  
+from .models import Ljubimac, KreiranjeKorisnika, Udomi  
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from .security import get_password_hash
 from fastapi import HTTPException
-from .models import Udomi
 from datetime import datetime
 import logging
+
 
 AsyncIOMotorClientType = AsyncIOMotorClient
 
@@ -17,8 +18,8 @@ async def create_user(db: AsyncIOMotorClientType, user: KreiranjeKorisnika):
         result = await db["users"].insert_one(user_dict)
         return str(result.inserted_id)
     except Exception as e:
+        logging.error(f"Failed to create user: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
 
 async def get_user(db: AsyncIOMotorClientType, user_id: str):
     try:
@@ -27,8 +28,8 @@ async def get_user(db: AsyncIOMotorClientType, user_id: str):
             return user
         raise HTTPException(status_code=404, detail="User not found")
     except Exception as e:
+        logging.error(f"Failed to fetch user: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-    
 
 async def create_pet(db: AsyncIOMotorClientType, pet: Ljubimac):
     try:
@@ -44,6 +45,7 @@ async def get_pets(db: AsyncIOMotorClientType):
         pets = await db["ljubimci"].find().to_list(length=None)
         return pets
     except Exception as e:
+        logging.error(f"Failed to fetch pets: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
@@ -53,8 +55,9 @@ async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
             return pet
         raise HTTPException(status_code=404, detail="Pet not found")
     except Exception as e:
+        logging.error(f"Failed to fetch pet: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
     try:
         adoption_data = {
@@ -66,4 +69,5 @@ async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
         logging.info(f"Pet adopted successfully. Adopter ID: {udomi_data.korisnik_id}, Pet ID: {udomi_data.ljubimac_id}")
         return str(result.inserted_id)
     except Exception as e:
+        logging.error(f"Failed to adopt pet: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
