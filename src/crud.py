@@ -2,7 +2,7 @@ from .schemas import ErrorResponse
 from .models import Ljubimac, KreiranjeKorisnika, Udomi  
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
-from .security import get_password_hash
+from .utils import get_password_hash
 from fastapi import HTTPException
 from datetime import datetime
 import logging

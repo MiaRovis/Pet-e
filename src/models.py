@@ -11,6 +11,7 @@ class Ljubimac(BaseModel):
 
 class KreiranjeKorisnika(BaseModel):
     email: EmailStr
+    username: str
     lozinka: str
 
 class Korisnik(BaseModel):
