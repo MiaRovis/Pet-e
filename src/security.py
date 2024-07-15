@@ -49,7 +49,7 @@ async def get_user_info(user_id: PyObjectId, db: AsyncIOMotorClientType = Depend
     from .crud import get_user
     try:
         user = await get_user(db, user_id)
-        return Korisnik(**user)
+        return user
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:

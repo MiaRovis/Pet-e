@@ -24,7 +24,7 @@ async def get_user(db: AsyncIOMotorClientType, user_id: str):
     try:
         user = await db["users"].find_one({"_id": ObjectId(user_id)})
         if user:
-            return Korisnik(**user)
+            return user
         raise HTTPException(status_code=404, detail="User not found")
     except Exception as e:
         logging.error(f"Failed to fetch user: {str(e)}")
