@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from .db import get_database, close_mongo_connection, connect_to_mongo
-from .models import KreiranjeKorisnika, Korisnik, Ljubimac, Udomi, DeleteAdoption
+from .models import KreiranjeKorisnika, Korisnik, Ljubimac, Udomi, DeleteAdoption, PyObjectId
 import logging
 from dotenv import load_dotenv
 from bson import ObjectId
@@ -45,11 +45,11 @@ async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClientType =
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/users/{user_id}", response_model=Korisnik)
-async def get_user_info(user_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
+async def get_user_info(user_id: PyObjectId, db: AsyncIOMotorClientType = Depends(get_database)):
     from .crud import get_user
     try:
         user = await get_user(db, user_id)
-        return user
+        return Korisnik(**user)
     except HTTPException as e:
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:

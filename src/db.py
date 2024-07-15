@@ -19,14 +19,14 @@ class DataBase:
 db = DataBase()
 
 async def connect_to_mongo():
-    db_url = os.getenv("MONGODB_URL", "mongodb+srv://admin:<admin>@cluster0.boinvpz.mongodb.net/")
+    db_url = os.getenv("MONGODB_URL", "mongodb+srv://admin:admin@cluster0.boinvpz.mongodb.net/")
     db_name = os.getenv("MONGODB_NAME", "Pet-e")
 
     if not db_url:
         logging.error("MongoDB URL not found in environment variables")
         raise ValueError("MongoDB URL not found in environment variables")
     try:
-        db.client = AsyncIOMotorClient("mongodb+srv://<admin>:<admin>@cluster0.boinvpz.mongodb.net/")
+        db.client = AsyncIOMotorClient("mongodb+srv://admin:admin@cluster0.boinvpz.mongodb.net/")
         db.mongodb = db.client[db_name]
         logging.info(f"Connected to MongoDB")
     except Exception as e:

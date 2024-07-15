@@ -1,5 +1,4 @@
-from .schemas import ErrorResponse  
-from .models import Ljubimac, KreiranjeKorisnika, Udomi  
+from .models import Ljubimac, KreiranjeKorisnika, Udomi, Korisnik
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from .utils import get_password_hash
@@ -13,7 +12,7 @@ AsyncIOMotorClientType = AsyncIOMotorClient
 async def create_user(db: AsyncIOMotorClientType, user: KreiranjeKorisnika):
     try:
         hashed_password = get_password_hash(user.lozinka)
-        user_dict = user.dict()
+        user_dict = user.model_dump()
         user_dict['lozinka'] = hashed_password
         result = await db["users"].insert_one(user_dict)
         return str(result.inserted_id)
@@ -25,7 +24,7 @@ async def get_user(db: AsyncIOMotorClientType, user_id: str):
     try:
         user = await db["users"].find_one({"_id": ObjectId(user_id)})
         if user:
-            return user
+            return Korisnik(**user)
         raise HTTPException(status_code=404, detail="User not found")
     except Exception as e:
         logging.error(f"Failed to fetch user: {str(e)}")
@@ -33,7 +32,7 @@ async def get_user(db: AsyncIOMotorClientType, user_id: str):
 
 async def create_pet(db: AsyncIOMotorClientType, pet: Ljubimac):
     try:
-        result = await db["ljubimci"].insert_one(pet.dict())
+        result = await db["ljubimci"].insert_one(pet.model_dump())
         logging.info(f"Pet created successfully. Pet ID: {str(result.inserted_id)}")
         return str(result.inserted_id)
     except Exception as e:
