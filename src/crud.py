@@ -1,4 +1,4 @@
-from .models import Ljubimac, KreiranjeKorisnika, Udomi, Korisnik
+from .models import Ljubimac, KreiranjeKorisnika, Udomi
 from motor.motor_asyncio import AsyncIOMotorClient
 from bson import ObjectId
 from .utils import get_password_hash
@@ -60,13 +60,22 @@ async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
 async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
     try:
         adoption_data = {
-            "korisnik_id": udomi_data.korisnik_id,
-            "ljubimac_id": udomi_data.ljubimac_id,
+            "korisnik": udomi_data.korisnik,
+            "ljubimac": udomi_data.ljubimac,
             "datum_udomljavanja": datetime.utcnow()
         }
         result = await db["udomi"].insert_one(adoption_data)
-        logging.info(f"Pet adopted successfully. Adopter ID: {udomi_data.korisnik_id}, Pet ID: {udomi_data.ljubimac_id}")
+        logging.info(f"Pet adopted successfully. Adopter: {udomi_data.korisnik}, Pet: {udomi_data.ljubimac}")
         return str(result.inserted_id)
     except Exception as e:
         logging.error(f"Failed to adopt pet: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+async def get_udomi(db: AsyncIOMotorClient, adoption_id: str):
+    try:
+        adoption = await db["udomi"].find_one({"_id": ObjectId(adoption_id)})
+        if not adoption:
+            raise HTTPException(status_code=404, detail="Adoption request not found")
+        return adoption
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
