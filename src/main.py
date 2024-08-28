@@ -57,7 +57,7 @@ async def get_all_users_info(db: AsyncIOMotorClientType = Depends(get_database))
         raise HTTPException(status_code=500, detail=str(e))
     
 # Dohvaćanje pojedinog korisnika po user_id iz baze
-@app.get("/users/{user_2id}", response_model=KreiranjeKorisnika)
+@app.get("/users/{user_id}", response_model=KreiranjeKorisnika)
 async def get_user_info(user_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         user = await get_user(db, user_id)
