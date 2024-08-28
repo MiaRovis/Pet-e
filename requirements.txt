@@ -1,0 +1,6 @@
+fastapi 
+motor 
+Pydantic 
+python-dotenv 
+passlib 
+
