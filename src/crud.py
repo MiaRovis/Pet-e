@@ -29,6 +29,14 @@ async def get_user(db: AsyncIOMotorClientType, user_id: str):
     except Exception as e:
         logging.error(f"Failed to fetch user: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+    
+async def get_all_users(db: AsyncIOMotorClientType):
+    try:
+        users = await db["users"].find().to_list(length=None) 
+        return users
+    except Exception as e:
+        logging.error(f"Failed to fetch users: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch users")
 
 async def create_pet(db: AsyncIOMotorClientType, pet: Ljubimac):
     try:
@@ -56,7 +64,7 @@ async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
     except Exception as e:
         logging.error(f"Failed to fetch pet: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-
+    
 async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
     try:
         adoption_data = {
@@ -70,6 +78,14 @@ async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
     except Exception as e:
         logging.error(f"Failed to adopt pet: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+async def get_all_udomi(db: AsyncIOMotorClientType):
+    try:
+        adoption_requests = await db["udomi"].find().to_list(length=None)
+        return adoption_requests
+    except Exception as e:
+        logging.error(f"Failed to fetch adoption requests: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch adoption requests")
     
 async def get_udomi(db: AsyncIOMotorClient, adoption_id: str):
     try:
@@ -79,3 +95,21 @@ async def get_udomi(db: AsyncIOMotorClient, adoption_id: str):
         return adoption
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+async def delete_adoption_request(db: AsyncIOMotorClientType, adoption_id: str):
+    try:
+        adoption_request = await db["udomi"].find_one({"_id": ObjectId(adoption_id)})
+        if not adoption_request:
+            raise HTTPException(status_code=404, detail="Adoption request not found")
+
+        result = await db["udomi"].delete_one({"_id": ObjectId(adoption_id)})
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Failed to delete adoption request")
+
+        logging.info(f"Adoption request deleted successfully. Adoption ID: {adoption_id}")
+        return {"message": "Adoption request deleted successfully"}
+    
+    except Exception as e:
+        logging.error(f"Failed to delete adoption request. Error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to delete adoption request")

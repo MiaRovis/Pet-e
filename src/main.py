@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from motor.motor_asyncio import AsyncIOMotorClient
 from .db import get_database, close_mongo_connection, connect_to_mongo
 from .models import Ljubimac, KreiranjeKorisnika, Udomi, DeleteAdoption
-from .crud import create_user, get_user, create_pet, get_pets, get_pet, udomi_pet, get_udomi
+from .crud import create_user, get_user, create_pet, get_pets, get_pet, udomi_pet, get_udomi, get_all_users, get_all_udomi
 import logging
 from dotenv import load_dotenv
 
@@ -39,6 +39,16 @@ async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClientType =
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/users/", response_model=list[KreiranjeKorisnika])
+async def get_all_users_info(db: AsyncIOMotorClientType = Depends(get_database)):
+    try:
+        users = await get_all_users(db)
+        return users
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e.detail))
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/users/{user_id}", response_model=KreiranjeKorisnika)
@@ -94,6 +104,15 @@ async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClientType = Depends
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:
         logging.error(f"An error occurred: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/udomi/", response_model=list[Udomi])
+async def get_all_udomi_requests(db: AsyncIOMotorClientType = Depends(get_database)):
+    try:
+        return await get_all_udomi(db)
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e.detail))
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
 @app.get("/udomi/{adoption_id}", response_model=Udomi)
