@@ -12,10 +12,12 @@ app = FastAPI()
 
 AsyncIOMotorClientType = AsyncIOMotorClient
 
+# Probni endpoint kako bi znali da sve radi kako treba
 @app.get("/")
 async def proba():
     return "Okej"
 
+# Funkcija za pokretanje
 async def startup_event():
     logging.basicConfig(
         level=logging.INFO,
@@ -23,12 +25,14 @@ async def startup_event():
     )
     await connect_to_mongo()
 
+#Funkcija za 'gašenje'
 async def shutdown_event():
     await close_mongo_connection()
 
 app.add_event_handler("startup", startup_event)
 app.add_event_handler("shutdown", shutdown_event)
 
+# Spremanje novog korisnika u bazu
 @app.post("/users/", response_model=str)
 async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -41,6 +45,7 @@ async def create_new_user(user: KreiranjeKorisnika, db: AsyncIOMotorClientType =
         logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     
+# Dohvaćanje svih korisnika iz baze
 @app.get("/users/", response_model=list[KreiranjeKorisnika])
 async def get_all_users_info(db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -50,8 +55,9 @@ async def get_all_users_info(db: AsyncIOMotorClientType = Depends(get_database))
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/users/{user_id}", response_model=KreiranjeKorisnika)
+    
+# Dohvaćanje pojedinog korisnika po user_id iz baze
+@app.get("/users/{user_2id}", response_model=KreiranjeKorisnika)
 async def get_user_info(user_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
         user = await get_user(db, user_id)
@@ -60,7 +66,8 @@ async def get_user_info(user_id: str, db: AsyncIOMotorClientType = Depends(get_d
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
+    
+# Spremanje ljubimaca u bazu
 @app.post("/ljubimci/", response_model=str)
 async def kreiraj_ljubimca(pet: Ljubimac, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -73,6 +80,7 @@ async def kreiraj_ljubimca(pet: Ljubimac, db: AsyncIOMotorClientType = Depends(g
         logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Dohvaćanje svih ljubimaca iz baze
 @app.get("/ljubimci/", response_model=list[Ljubimac])
 async def dohvati_ljubimce(db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -82,6 +90,7 @@ async def dohvati_ljubimce(db: AsyncIOMotorClientType = Depends(get_database)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Dohvaćanje pojedinog ljubimca iz baze
 @app.get("/ljubimci/{ljubimac_id}", response_model=Ljubimac)
 async def dohvati_ljubimca(ljubimac_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -94,6 +103,7 @@ async def dohvati_ljubimca(ljubimac_id: str, db: AsyncIOMotorClientType = Depend
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Spremanje zahtjeva za udomljenje u bazu
 @app.post("/udomi/", response_model=str)
 async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -105,7 +115,8 @@ async def udomi_ljubimca(udomi_data: Udomi, db: AsyncIOMotorClientType = Depends
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# Dohvaćanje svih zahtjeva za udomljenje iz baze  
 @app.get("/udomi/", response_model=list[Udomi])
 async def get_all_udomi_requests(db: AsyncIOMotorClientType = Depends(get_database)):
     try:
@@ -114,7 +125,8 @@ async def get_all_udomi_requests(db: AsyncIOMotorClientType = Depends(get_databa
         raise HTTPException(status_code=e.status_code, detail=str(e.detail))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# Dohvaćanje zahtjeva iz baze po adoption_id   
 @app.get("/udomi/{adoption_id}", response_model=Udomi)
 async def get_adoption_request(adoption_id: str, db: AsyncIOMotorClient = Depends(get_database)):
     try:
@@ -127,6 +139,7 @@ async def get_adoption_request(adoption_id: str, db: AsyncIOMotorClient = Depend
         logging.error(f"An error occurred: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Brisanje zahtjeva za udomljenje iz baze
 @app.delete("/udomi/{adoption_id}", response_model=DeleteAdoption)
 async def delete_adoption_request(adoption_id: str, db: AsyncIOMotorClientType = Depends(get_database)):
     try:

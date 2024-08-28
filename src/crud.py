@@ -9,6 +9,7 @@ import logging
 
 AsyncIOMotorClientType = AsyncIOMotorClient
 
+# Funkcija za kreiranje korisnika
 async def create_user(db: AsyncIOMotorClientType, user: KreiranjeKorisnika):
     try:
         hashed_password = get_password_hash(user.lozinka)
@@ -20,6 +21,7 @@ async def create_user(db: AsyncIOMotorClientType, user: KreiranjeKorisnika):
         logging.error(f"Failed to create user: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Funkcija za dohvaćanje određenog korisnika
 async def get_user(db: AsyncIOMotorClientType, user_id: str):
     try:
         user = await db["users"].find_one({"_id": ObjectId(user_id)})
@@ -29,7 +31,8 @@ async def get_user(db: AsyncIOMotorClientType, user_id: str):
     except Exception as e:
         logging.error(f"Failed to fetch user: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+#Funkcija za dohvaćanje svih korisnika    
 async def get_all_users(db: AsyncIOMotorClientType):
     try:
         users = await db["users"].find().to_list(length=None) 
@@ -38,6 +41,7 @@ async def get_all_users(db: AsyncIOMotorClientType):
         logging.error(f"Failed to fetch users: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch users")
 
+# Funkcija za kreiranje ljubimca
 async def create_pet(db: AsyncIOMotorClientType, pet: Ljubimac):
     try:
         result = await db["ljubimci"].insert_one(pet.model_dump())
@@ -47,6 +51,7 @@ async def create_pet(db: AsyncIOMotorClientType, pet: Ljubimac):
         logging.error(f"Pet creation failed. Error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Funkcija za dohvaćanje ljubimca
 async def get_pets(db: AsyncIOMotorClientType):
     try:
         pets = await db["ljubimci"].find().to_list(length=None)
@@ -55,6 +60,7 @@ async def get_pets(db: AsyncIOMotorClientType):
         logging.error(f"Failed to fetch pets: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Funkcija za dohvaćanje određenog ljubimca
 async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
     try:
         pet = await db["ljubimci"].find_one({"_id": ObjectId(pet_id)})
@@ -64,7 +70,8 @@ async def get_pet(db: AsyncIOMotorClientType, pet_id: str):
     except Exception as e:
         logging.error(f"Failed to fetch pet: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-    
+
+# Funkcija za kreiranje zahtjeva za udomljenje 
 async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
     try:
         adoption_data = {
@@ -79,6 +86,7 @@ async def udomi_pet(db: AsyncIOMotorClientType, udomi_data: Udomi):
         logging.error(f"Failed to adopt pet: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# Funkcija za dohvaćanje svih zahtjeva za udomljenje
 async def get_all_udomi(db: AsyncIOMotorClientType):
     try:
         adoption_requests = await db["udomi"].find().to_list(length=None)
@@ -86,7 +94,8 @@ async def get_all_udomi(db: AsyncIOMotorClientType):
     except Exception as e:
         logging.error(f"Failed to fetch adoption requests: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch adoption requests")
-    
+
+ # Funkcija za dohvaćanje određenog zahtjeva za udomljenje   
 async def get_udomi(db: AsyncIOMotorClient, adoption_id: str):
     try:
         adoption = await db["udomi"].find_one({"_id": ObjectId(adoption_id)})
@@ -96,6 +105,7 @@ async def get_udomi(db: AsyncIOMotorClient, adoption_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# Funkcija za brisanje zahtjeva za udomljenje
 async def delete_adoption_request(db: AsyncIOMotorClientType, adoption_id: str):
     try:
         adoption_request = await db["udomi"].find_one({"_id": ObjectId(adoption_id)})
